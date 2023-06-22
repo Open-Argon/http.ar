@@ -1,11 +1,36 @@
-import "./listener" as listener
+import "listener" as listener
+import "logger" as logger
+import "static" as static
 
-let server(port) = do
+static = static.static
+logger = logger.logger
+
+let server() = do
     let class = {}
+    let threads = []
+    let numThreads = 10
     let routes = []
-    class.run() = do
-        let Socket = socket("tcp", port)
-        listener.listener(Socket, routes)
-    class.route(path, callback) = do
-        routes.append({path: path, callback: callback})
+    class.setNumberOfThreads(num) = do
+        numThreads = num
+    class.run(options) = do
+        let Socket = socket("tcp", options.port)
+        let onErr = null
+        if ("onErr" in options) do
+            onErr = options.onErr
+        for (i from 0 to numThreads) do
+            t = thread(()=listener.listener(Socket, routes, onErr))
+            threads.append(t)
+            t.start()
+        if ("callback" in options) do
+            options.callback(options.port)
+        for (i from 0 to threads.length) do
+            threads[i].join()
+        
+        
+    class.route(path, methods, callback) = do
+        if (methods == null) do
+            methods = ["GET"]
+        routes.append({path: path, callback: callback, methods: methods, type: "route"})
+    class.use(callback) = do
+        routes.append({callback: callback, type: "middleware"})
     return class.object()

@@ -1,23 +1,10 @@
-import "parseRequest" as parseRequest
-import "buildResponse" as buildResponse
+import "handleRequest" as handleRequest
 
-let listener(Socket, routes) = do
+let listener(Socket, routes, onErr) = do
     while (not Socket.isClosed()) do
         try do
             let conn = Socket.accept()
             let data = conn.read(1024)
-            let request = parseRequest.parse(data)
-            let response_headers = {}
-            let response_code = 200
-            response_headers["Content-Type"] = "text/html"
-            let response = {}
-            response.send(data) = do
-                let response_data = buildResponse.build(response_headers, response_code, data)
-                conn.write(response_data)
-                conn.close()
-            for (i from 0 to routes.length) do
-                if (routes[i].path == request.path) do
-                    routes[i].callback(request, response)
-                    break
-        catch (err) do
-            term.error(err)
+            handleRequest.handle(routes, conn, data)
+        catch (e) do
+            term.log(e)

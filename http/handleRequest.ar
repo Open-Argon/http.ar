@@ -1,0 +1,53 @@
+import "buildResponse" as buildResponse
+import "parseRequest" as parseRequest
+
+let handle(routes, conn, data) = do
+    let request = parseRequest.parse(data)
+    request.RemoteAddr = conn.RemoteAddr()
+    let response_headers = {}
+    response_headers["Content-Type"] = "text/html; charset=utf-8"
+    let OnEnd = []
+    let response = {code:200}
+    response.onEnd(callback) = do
+        OnEnd.append(callback)
+    response.sendFile(path) = do
+        FILE = file.read(path)
+        response_headers["Content-Type"] = FILE.contentType()
+        response.send(FILE.text())
+    
+    response.onErr(err) = do
+        response.code = 500
+        response.send("<h1>500 Internal Server Error</h1>")
+
+    response.json(data) = do
+        let strdata = json.stringify(data)
+        response_headers["Content-Type"] = "application/json"
+        response.send(strdata)
+    response.send(data) = do
+        response_headers["Content-Length"] = string(data.length)
+        response_headers["Connection"] = "close"
+        response_headers["Date"] = time.now().format()
+        let response_data = buildResponse.build(response_headers, response.code, data)
+        conn.write(response_data)
+        conn.close()
+        for (i from 0 to OnEnd.length) do
+            OnEnd[i]()
+    let toTry = []
+    for (i from 0 to routes.length) do
+        let route = routes[i]
+        if (route.type == "middleware" || (route.path == request.path && request.method in route.methods)) do
+            toTry.append(route)
+    let trying = -1
+    let next() = do
+        trying = trying + 1
+        if (trying < toTry.length) do
+            let route = toTry[trying]
+            response.next = next
+            try do
+                route.callback(request, response)
+            catch (err) do
+                response.onErr(err)
+        else do
+            response.code = 404
+            response.send("<h1>404 Not Found</h1>")
+    next()

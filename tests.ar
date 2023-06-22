@@ -1,5 +1,0 @@
-import "http" as http
-
-serve = http.server(8000)
-serve.route("/", (req, resp) = resp.send("<h1>Hello, world! lol</h1>"))
-serve.run()

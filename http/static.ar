@@ -1,0 +1,11 @@
+let static(path) = do
+    let middleware(req, res) = do
+        let pathsToTry = [path+req.path, path+req.path+"/index.html"]
+        for (i from 0 to pathsToTry.length) do
+            try do
+                res.sendFile(pathsToTry[i])
+                return null
+            catch (_) do
+                continue
+        res.next()
+    return middleware
