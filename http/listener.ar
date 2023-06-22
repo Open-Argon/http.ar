@@ -1,0 +1,11 @@
+import "parseRequest" as parseRequest
+
+let listener(Socket) = do
+    while (not Socket.isClosed()) do
+        try do
+            conn = Socket.accept()
+            data = conn.read(1024)
+            request = parseRequest.parse(data)
+            term.log(request)
+        catch (err) do
+            term.error("Error: " + err)

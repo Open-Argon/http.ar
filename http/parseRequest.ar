@@ -1,0 +1,14 @@
+let parse(requestData) = do
+    let split = requestData.split("\r\n")
+    let requestLine = split[0].split(" ")
+    let method = requestLine[0]
+    let path = requestLine[1]
+    let version = requestLine[2]
+    let headers = {}
+    for (i from 1 to split.length) do
+        let header = split[i].split(": ")
+        if (header.length < 2) break
+        let name = header[0]
+        let value = header[1:].join(": ")
+        headers[name] = value
+    return {method: method, path: path, version: version, headers: headers}

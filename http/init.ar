@@ -1,0 +1,8 @@
+import "./listener" as listener
+
+let server(port) = do
+    let class = {}
+    class.run() = do
+        let Socket = socket("tcp", port)
+        listener.listener(Socket)
+    return class.object()

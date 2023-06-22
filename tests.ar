@@ -1,0 +1,4 @@
+import "http" as http
+
+serve = http.server(8000)
+serve.run()
