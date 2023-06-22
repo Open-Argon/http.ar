@@ -7,13 +7,21 @@ app.use(http.logger)
 app.use(http.static("static"))
 
 let home(req, res) = do
-    res.sendFile("index.html")
+    res.sendFile("static/index.html")
 app.route("/", null, home)
 
 let api(req, res) = do
     data = "cool"
     res.json({(data): "Hello, World!", description: "This is a test.", π: π, πRational: fraction(π)})
 app.route("/api", null, api)
+
+let api(req, res) = do
+    res.json(req.params)
+app.route("/params/example/<name>", null, api)
+
+let rand(req, res) = do
+    res.json(random())
+app.route("/random", null, rand)
 
 let about(req, res) = do
     res.send("<h1>About</h1>")

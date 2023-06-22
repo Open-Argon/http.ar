@@ -1,0 +1,40 @@
+let decode(data) = do
+    let decoded = []
+    let i = 0
+    while (i < data.length) do
+        if (data[i] == "%") do
+            decoded.append(chr(number("0x"+data[i+1:i+3])))
+            i = i + 3
+        else do
+            decoded.append(data[i])
+            i = i + 1
+    return decoded.join("")
+
+let toNotEncode = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~"
+
+let encode(data) = do
+    let encoded = []
+    let i = 0
+    while (i < data.length) do
+        if (data[i] in toNotEncode) do
+            encoded.append(data[i])
+        else do
+            encoded.append("%"+hex(ord(data[i])))
+        i = i + 1
+    return encoded.join("")
+
+let split(url) = do
+    let split = url.split("?")
+    if (split.length == 1) do
+        return {path: split[0], query: {}}
+    else do
+        querytext = split[1:].join("?")
+        let query = {}
+        let querySplit = querytext.split("&")
+        for (i from 0 to querySplit.length) do
+            let queryItem = querySplit[i].split("=")
+            if (queryItem.length == 1) do
+                query[decode(queryItem[0])] = ""
+            else do
+                query[decode(queryItem[0])] = decode(queryItem[1])
+        return {path: split[0], query: query}

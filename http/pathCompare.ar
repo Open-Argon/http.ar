@@ -1,0 +1,15 @@
+import "url" as url
+
+let compare(structure, path) = do
+    let structureSplit = structure.split("/")
+    let pathSplit = path.split("/")
+    let params = {}
+    if (structureSplit.length != pathSplit.length) do
+        return {match: false, params: null}
+    
+    for (i from 0 to structureSplit.length) do
+        if (structureSplit[i].length > 2 && structureSplit[i][0] == "<" && structureSplit[i][-1] == ">") do
+            params[structureSplit[i][1:-1]] = url.decode(pathSplit[i])
+        else if (structureSplit[i] != pathSplit[i]) do
+            return {match: false, params: null}
+    return {match: true, params: params}

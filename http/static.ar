@@ -4,7 +4,7 @@ let static(path) = do
         for (i from 0 to pathsToTry.length) do
             try do
                 res.sendFile(pathsToTry[i])
-                return null
+                return
             catch (_) do
                 continue
         res.next()
