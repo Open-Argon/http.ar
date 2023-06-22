@@ -7,5 +7,7 @@ let listener(Socket) = do
             data = conn.read(1024)
             request = parseRequest.parse(data)
             term.log(request)
+            conn.write("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>Hello, world!</h1></body></html>")
+            conn.close()
         catch (err) do
-            term.error("Error: " + err)
+            term.error(err)
