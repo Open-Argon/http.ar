@@ -2,7 +2,10 @@ import "./listener" as listener
 
 let server(port) = do
     let class = {}
+    let routes = []
     class.run() = do
         let Socket = socket("tcp", port)
-        listener.listener(Socket)
+        listener.listener(Socket, routes)
+    class.route(path, callback) = do
+        routes.append({path: path, callback: callback})
     return class.object()
