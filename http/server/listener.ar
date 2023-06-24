@@ -4,7 +4,8 @@ let listener(Socket, routes, onErr) = do
     while (not Socket.isClosed()) do
         try do
             let conn = Socket.accept()
-            let data = conn.read(1024*1024)
-            handleRequest.handle(routes, conn, data)
+            let data = conn.read(1024*1024).to("string")
+            t = thread(()=handleRequest.handle(routes, conn, data, onErr))
+            t.start()
         catch (e) do
-            term.log(e)
+            if (onErr) onErr(e)

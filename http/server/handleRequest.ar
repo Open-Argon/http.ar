@@ -1,0 +1,124 @@
+import "buildResponse" as buildResponse
+import "parseRequest" as parseRequest
+import "pathCompare" as pathCompare
+import "../url" as url
+import "../version" as version
+
+let handle(routes, conn, data, onErr) = do
+    try do
+        let request = parseRequest.parse(data)
+        request.RemoteAddr = conn.RemoteAddr()
+        let splitURL = url.split(request.path)
+        request.path = splitURL.path
+        request.query = splitURL.query
+        request.on = {}
+        request.on.headersSent = []
+        request.on.end = []
+        let bufferSize = 1024*1024*10
+        request.headersSent = false
+        let response = {code:200, headers:{"Content-Type": "text/html; charset=utf-8", "Server": "http.ar/"+version.version+" Argon/"+ArgonVersion}}
+        
+        request.isClosed = conn.isClosed
+
+        response.sendHeaders() = do
+            if (request.headersSent) return
+            response.headers["Date"] = time.now().format()
+            let response_data = buildResponse.build(response.headers, response.code, "")
+            request.headersSent = true
+            conn.write(buffer().from(response_data))
+            for (i from 0 to request.on.headersSent.length) do
+                request.on.headersSent[i]()
+        
+        response.sendFile(path) = do
+            let FILE = file.read(path)
+            response.headers["Content-Type"] = FILE.contentType()
+            response.headers["Content-Disposition"] = "inline; filename="+json.stringify(path.split("/")[-1])
+            let doRange = "Range" in request.headers
+            let FileSize = FILE.size()
+            let size = FileSize
+            if (doRange) do
+                response.code = 206
+                let range = request.headers["Range"].split("=")[1].split("-")
+                let start = number(range[0])
+                let end = 0
+                if (range.length > 1 && range[1] != "") do
+                    end = number(range[1])
+                else do
+                    end = size-1
+                if (end > size) do
+                    end = size
+                FILE.seek(start)
+                size = end - start
+                response.headers["Content-Range"] = "bytes "+fraction(start)[:-2]+"-"+fraction(end)[:-2]+"/"+fraction(FileSize)[:-2]
+                response.headers["Accept-Ranges"] = "bytes"
+            response.headers["Content-Length"] = fraction(size)[:-2]
+            let sizeLeft = size
+            response.sendHeaders()
+            let LocalBufferSize = min([bufferSize, sizeLeft])
+            let data = FILE.buffer(LocalBufferSize)
+            while ((not conn.isClosed()) && data.length > 0) do
+                bufferThread = thread(()=FILE.buffer(LocalBufferSize))
+                bufferThread.start()
+                conn.write(data)
+                sizeLeft = sizeLeft - data.length
+                try do
+                    data = bufferThread.join()
+                catch (_) do
+                    data = buffer()
+            response.close()
+        
+        response.close() = do
+            conn.close()
+            for (i from 0 to request.on.end.length) do
+                request.on.end[i]()
+        
+        response.onErr(err) = do
+            term.log(err)
+            response.code = 500
+            response.send("<h1>500 Internal Server Error</h1>")
+
+        response.json(data) = do
+            let strdata = json.stringify(data)
+            response.headers["Content-Type"] = "application/json"
+            response.send(strdata)
+        response.data(data) = do
+            response.sendHeaders()
+            conn.write(buffer().from(data))
+            
+        response.send(data) = do
+            response.headers["Connection"] = "close"
+            response.sendHeaders()
+            conn.write(buffer().from(data))
+            response.close()
+        
+        let toTry = []
+        for (i from 0 to routes.length) do
+            let route = routes[i]
+            if (route.type == "middleware") do
+                toTry.append(route)
+            else if (request.method in route.methods) do
+                let comparison = pathCompare.compare(route.path, request.path)
+                if (comparison.match) do
+                    route.params = comparison.params
+                    toTry.append(route)
+        let trying = -1
+        let next() = do
+            trying = trying + 1
+            if (trying < toTry.length) do
+                let route = toTry[trying]
+                response.next = next
+                if ("params" in route) do
+                    request.params = route.params
+                else do
+                    request.params = {}
+                try do
+                    route.callback(request, response)
+                catch (err) do
+                    response.onErr(err)
+            else do
+                response.code = 404
+                response.send("<h1>404 Not Found</h1>")
+        next()
+    catch (e) do
+        if (onErr) onErr(e)
+        else term.log(e)

@@ -1,0 +1,140 @@
+let errorCodeToString(code) = do
+    
+    if (code == 100) do
+        return "Continue"
+    else if (code == 101) do
+        return "Switching Protocols"
+    else if (code == 102) do
+        return "Processing"
+    else if (code == 103) do
+        return "Early Hints"
+    else if (code == 200) do
+        return "OK"
+    else if (code == 201) do
+        return "Created"
+    else if (code == 202) do
+        return "Accepted"
+    else if (code == 203) do
+        return "Non-Authoritative Information"
+    else if (code == 204) do
+        return "No Content"
+    else if (code == 205) do
+        return "Reset Content"
+    else if (code == 206) do
+        return "Partial Content"
+    else if (code == 207) do
+        return "Multi-Status"
+    else if (code == 208) do
+        return "Already Reported"
+    else if (code == 226) do
+        return "IM Used"
+    else if (code == 300) do
+        return "Multiple Choices"
+    else if (code == 301) do
+        return "Moved Permanently"
+    else if (code == 302) do
+        return "Found"
+    else if (code == 303) do
+        return "See Other"
+    else if (code == 304) do
+        return "Not Modified"
+    else if (code == 305) do
+        return "Use Proxy"
+    else if (code == 306) do
+        return "Switch Proxy"
+    else if (code == 307) do
+        return "Temporary Redirect"
+    else if (code == 308) do
+        return "Permanent Redirect"
+    else if (code == 400) do
+        return "Bad Request"
+    else if (code == 401) do
+        return "Unauthorized"
+    else if (code == 402) do
+        return "Payment Required"
+    else if (code == 403) do
+        return "Forbidden"
+    else if (code == 404) do
+        return "Not Found"
+    else if (code == 405) do
+        return "Method Not Allowed"
+    else if (code == 406) do
+        return "Not Acceptable"
+    else if (code == 407) do
+        return "Proxy Authentication Required"
+    else if (code == 408) do
+        return "Request Timeout"
+    else if (code == 409) do
+        return "Conflict"
+    else if (code == 410) do
+        return "Gone"
+    else if (code == 411) do
+        return "Length Required"
+    else if (code == 412) do
+        return "Precondition Failed"
+    else if (code == 413) do
+        return "Payload Too Large"
+    else if (code == 414) do
+        return "URI Too Long"
+    else if (code == 415) do
+        return "Unsupported Media Type"
+    else if (code == 416) do
+        return "Range Not Satisfiable"
+    else if (code == 417) do
+        return "Expectation Failed"
+    else if (code == 418) do
+        return "I'm a teapot"
+    else if (code == 421) do
+        return "Misdirected Request"
+    else if (code == 422) do
+        return "Unprocessable Entity"
+    else if (code == 423) do
+        return "Locked"
+    else if (code == 424) do
+        return "Failed Dependency"
+    else if (code == 425) do
+        return "Too Early"
+    else if (code == 426) do
+        return "Upgrade Required"
+    else if (code == 428) do
+        return "Precondition Required"
+    else if (code == 429) do
+        return "Too Many Requests"
+    else if (code == 431) do
+        return "Request Header Fields Too Large"
+    else if (code == 451) do
+        return "Unavailable For Legal Reasons"
+    else if (code == 500) do
+        return "Internal Server Error"
+    else if (code == 501) do
+        return "Not Implemented"
+    else if (code == 502) do
+        return "Bad Gateway"
+    else if (code == 503) do
+        return "Service Unavailable"
+    else if (code == 504) do
+        return "Gateway Timeout"
+    else if (code == 505) do
+        return "HTTP Version Not Supported"
+    else if (code == 506) do
+        return "Variant Also Negotiates"
+    else if (code == 507) do
+        return "Insufficient Storage"
+    else if (code == 508) do
+        return "Loop Detected"
+    else if (code == 510) do
+        return "Not Extended"
+    else if (code == 511) do
+        return "Network Authentication Required"
+    else do
+        return "Unknown Error"
+
+let build(headers, code, data) = do
+    let output = []
+    output.append("HTTP/1.1 "+string(code)+" "+errorCodeToString(code))
+    let keys = headers.keys()
+    for (i from 0 to keys.length) do
+        output.append(keys[i] + ": " + headers[keys[i]])
+    output.append("")
+    output.append(data)
+    return output.join("\r\n")

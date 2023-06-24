@@ -1,4 +1,5 @@
 let decode(data) = do
+    data = data.replace("+", " ")
     let decoded = []
     let i = 0
     while (i < data.length) do
@@ -38,3 +39,55 @@ let split(url) = do
             else do
                 query[decode(queryItem[0])] = decode(queryItem[1])
         return {path: split[0], query: query}
+
+
+let URL(url) = do
+    let protocol = null
+    let host = null
+    let port = null
+    let path = null
+    let query = null
+    let hash = null
+    let splitFunc = split
+    try do
+        let split = url.split("://")
+        if (split.length == 1) do
+            protocol = "http"
+            split = url.split("/")
+            if (split.length == 1) do
+                host = split[0]
+                path = "/"
+            else do
+                host = split[0]
+                path = "/"+split[1:].join("/")
+        else do
+            protocol = split[0]
+            split = split[1].split("/")
+            if (split.length == 1) do
+                host = split[0]
+                path = "/"
+            else do
+                host = split[0]
+                path = "/"+split[1:].join("/")
+        split = host.split(":")
+        if (split.length == 1) do
+            host = split[0]
+            if (protocol == "http") do
+                port = 80
+            else if (protocol == "https") do
+                port = 443
+        else do
+            host = split[0]
+            port = number(split[1:].join(":"))
+        split = path.split("#")
+        if (split.length == 1) do
+            path = split[0]
+        else do
+            path = split[0]
+            hash = split[1:].join("#")
+        let split = splitFunc(path)
+        path = split.path
+        query = split.query
+        return {protocol: protocol, host: host, port: port, path: path, query: query, hash: hash}
+    catch (e) do
+        return

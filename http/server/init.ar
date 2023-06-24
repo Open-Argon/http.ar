@@ -10,11 +10,15 @@ let server() = do
     let threads = []
     let numThreads = 10
     let routes = []
+    let Socket = null
     class.setNumberOfThreads(num) = do
         numThreads = num
     class.run(options) = do
-        let Socket = socket("tcp", options.port)
-        let onErr = null
+        Socket = socket.server("tcp", options.port)
+        let onErr(e) = do
+            term.error(e.type+": "+e.message)
+            term.error(e.code)
+            term.error(e.path+" on line "+e.line)
         if ("onErr" in options) do
             onErr = options.onErr
         for (i from 0 to numThreads) do
@@ -25,7 +29,8 @@ let server() = do
             options.callback(options.port)
         for (i from 0 to threads.length) do
             threads[i].join()
-        
+    
+    class.close() = Socket.close()
         
     class.route(path, methods, callback) = do
         if (methods == null) do

@@ -1,0 +1,10 @@
+conn = socket.client("tcp", "localhost:8000")
+RequestHeaders = "GET /movie.ffreg HTTP/1.1\nHost: localhost:8000\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\nAccept-Language: en-US,en;q=0.5\nAccept-Encoding: gzip, deflate, br\nDNT: 1\nConnection: keep-alive\nUpgrade-Insecure-Requests: 1\nSec-Fetch-Dest: document\nSec-Fetch-Mode: navigate\nSec-Fetch-Site: cross-site\nPragma: no-cache"
+RequestBuffer = buffer().from(RequestHeaders)
+conn.write(RequestBuffer)
+while (not conn.isClosed()) do
+    try do
+        Response = conn.read(1024)
+        term.plain.oneLine(Response.to("string"))
+    catch (_) do
+        break

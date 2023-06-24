@@ -7,5 +7,6 @@ let static(path) = do
                 return
             catch (_) do
                 continue
+        if (req.isClosed()) return
         res.next()
     return middleware

@@ -11,5 +11,5 @@ let logger(req, res) = do
             COLOUR = colour.fg.magenta
         date = time.now().format()
         term.log(colour.set(COLOUR, req.RemoteAddr+" - - ["+date+"] "+req.method+" "+req.path+" - "+string(res.code)))
-    res.onEnd(onEnd)
+    req.on.headersSent.append(onEnd)
     res.next()

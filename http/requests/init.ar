@@ -1,0 +1,9 @@
+import "../url" as urllib
+
+let get(url) = do
+    if (not url.startswith("http://") && not url.startswith("https://")) do
+        throwError("Invalid URL: "+url)
+    URL = urllib.URL(url)
+    if (not URL) do
+        return null
+    

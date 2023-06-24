@@ -1,4 +1,4 @@
-import "url" as url
+import "../url" as url
 
 let compare(structure, path) = do
     let structureSplit = structure.split("/")
@@ -10,6 +10,6 @@ let compare(structure, path) = do
     for (i from 0 to structureSplit.length) do
         if (structureSplit[i].length > 2 && structureSplit[i][0] == "<" && structureSplit[i][-1] == ">") do
             params[structureSplit[i][1:-1]] = url.decode(pathSplit[i])
-        else if (structureSplit[i] != pathSplit[i]) do
+        else if (url.decode(structureSplit[i]) != url.decode(pathSplit[i])) do
             return {match: false, params: null}
     return {match: true, params: params}

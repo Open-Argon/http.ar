@@ -1,14 +1,10 @@
-import "http" as http
+import "http/server" as http
 
 app = http.server()
 
 app.use(http.logger)
 
 app.use(http.static("static"))
-
-let home(req, res) = do
-    res.sendFile("static/index.html")
-app.route("/", null, home)
 
 let api(req, res) = do
     data = "cool"
@@ -19,9 +15,22 @@ let api(req, res) = do
     res.json(req.params)
 app.route("/params/example/<name>", null, api)
 
+let wait(req, res) = do
+    for (i from 0 to number(req.params.seconds)) do
+        time.snooze(1)
+        res.text((1+i)+" seconds have passed. ")
+    res.close()
+app.route("/wait/<seconds>", null, wait)
+
 let rand(req, res) = do
     res.json(random())
 app.route("/random", null, rand)
+
+let close(req, res) = do
+    app.close()
+    res.json(true)
+    exit()
+app.route("/close", null, close)
 
 let about(req, res) = do
     res.send("<h1>About</h1>")
@@ -31,9 +40,9 @@ let contact(req, res) = do
     res.send("<h1>Contact</h1>")
 app.route("/contact", null, contact)
 
-let notFound(req, res) = do
+let err404(req, res) = do
     res.code = 404
-    res.send("<h1>404 Not Found lol</h1>")
-app.use(notFound)
+    res.sendFile("static/404.html")
+app.use(err404)
 
 app.run({port: 8000, callback: (port) = term.log("Listening on port "+string(port))})
