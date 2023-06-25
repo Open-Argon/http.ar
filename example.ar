@@ -1,4 +1,4 @@
-import "http/server" as http
+import "http" as http
 
 app = http.server()
 

@@ -1,8 +1,8 @@
 import "buildResponse" as buildResponse
 import "parseRequest" as parseRequest
 import "pathCompare" as pathCompare
-import "../url" as url
-import "../version" as version
+import "url" as url
+import "version" as version
 
 let handle(routes, conn, data, onErr) = do
     try do
@@ -73,8 +73,10 @@ let handle(routes, conn, data, onErr) = do
                 request.on.end[i]()
         
         response.onErr(err) = do
-            term.log(err)
+            if (onErr) onErr(err)
+            else term.log(err)
             response.code = 500
+            response.headers = {"Content-Type": "text/html; charset=utf-8", "Server": "http.ar/"+version.version+" Argon/"+ArgonVersion}
             response.send("<h1>500 Internal Server Error</h1>")
 
         response.json(data) = do
@@ -88,6 +90,7 @@ let handle(routes, conn, data, onErr) = do
         response.send(data) = do
             response.headers["Connection"] = "close"
             response.sendHeaders()
+            if (conn.isClosed()) return
             conn.write(buffer().from(data))
             response.close()
         
