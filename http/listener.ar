@@ -1,6 +1,6 @@
 import "handleRequest" as handleRequest
 
-let readChunkSize = 1024^3
+let readChunkSize = 1024^2
 
 let listener(Socket, routes, onErr) = do
     while (not Socket.isClosed()) do
