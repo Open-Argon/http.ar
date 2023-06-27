@@ -109,7 +109,6 @@ let handle(routes, conn, data, onErr) = do
             trying = trying + 1
             if (trying < toTry.length) do
                 let route = toTry[trying]
-                response.next = next
                 if ("params" in route) do
                     request.params = route.params
                 else do
@@ -121,6 +120,7 @@ let handle(routes, conn, data, onErr) = do
             else do
                 response.code = 404
                 response.send("<h1>404 Not Found</h1>")
+        response.next = next
         next()
     catch (e) do
         if (onErr) onErr(e)
