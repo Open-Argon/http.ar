@@ -4,6 +4,14 @@ app = http.server()
 
 app.use(http.logger)
 
+app.use(http.cookie)
+
+let setCookie(req, res) = do
+    term.log(req.cookies)
+    res.setCookie("test", {value: "test"})
+    res.next()
+app.use(setCookie)
+
 app.use(http.static("static"))
 
 let api(req, res) = do

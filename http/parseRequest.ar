@@ -1,5 +1,6 @@
 let parse(requestData) = do
-    let split = requestData.split("\r\n")
+    let textData = requestData.to("string")
+    let split = textData.split("\r\n")
     let requestLine = split[0].split(" ")
     let method = requestLine[0]
     let path = requestLine[1]

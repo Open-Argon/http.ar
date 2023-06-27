@@ -134,9 +134,12 @@ let build(headers, code, data) = do
     output.append("HTTP/1.1 "+string(code)+" "+errorCodeToString(code))
     let keys = headers.keys()
     for (i from 0 to keys.length) do
-        if ("\n" in headers[keys[i]]) do
+        let value = headers[keys[i]]
+        if (typeof(value) == "array") do
+            value = value.join("\n"+keys[i] + ": ")
+        if ("\n" in value) do
             throwError("Response Header Build Error","Header '"+keys[i]+"' contains newline. This can be a security risk.")
-        output.append(keys[i] + ": " + headers[keys[i]])
+        output.append(keys[i] + ": " + value)
     output.append("")
     output.append(data)
     return output.join("\r\n")

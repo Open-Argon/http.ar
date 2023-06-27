@@ -1,0 +1,61 @@
+let validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'*+-.^_`|~"
+
+let valid(value) = do
+    for (i from 0 to value.length) do
+        if (value[i] not in validChars) return false
+    return true
+
+let cookie(req, res) = do
+    let cookies = {}
+
+    if ("Cookie" in req.headers) do
+        let cookie = req.headers["Cookie"]
+        cookie = cookie.split("; ")
+        for (i from 0 to cookie.length) do
+            let c = cookie[i].split("=")
+            cookies[c[0]] = c[1]
+
+    req.cookies = cookies
+
+    res.setCookie(name, cookie) = do
+        let value = cookie.value
+        if (not valid(name)) do
+            throwError('set cookie error',"Invalid cookie name")
+        else if (not valid(value)) do
+            throwError('set cookie error',"Invalid cookie value")
+        let setCookie = []
+        if ("Set-Cookie" in res.headers) do
+            setCookie = res.headers["Set-Cookie"]
+            if (typeof(setCookie) == "string") do
+                setCookie = [setCookie]
+        let output = [name+"="+value]
+        if ("expires" in cookie) do
+            if (not valid(cookie.expires)) do
+                throwError('set cookie error',"Invalid cookie expires")
+            output.append("Expires="+cookie.expires)
+        if ("maxAge" in cookie) do
+            if (not valid(cookie.maxAge)) do
+                throwError('set cookie error',"Invalid cookie max-age")
+            output.append("Max-Age="+cookie.maxAge)
+        if ("domain" in cookie) do
+            if (not valid(cookie.domain)) do
+                throwError('set cookie error',"Invalid cookie domain")
+            output.append("Domain="+cookie.domain)
+        if ("path" in cookie) do
+            if (not valid(cookie.path)) do
+                throwError('set cookie error',"Invalid cookie path")
+            output.append("Path="+cookie.path)
+        if ("sameSite" in cookie) do
+            if (not valid(cookie.sameSite)) do
+                throwError('set cookie error',"Invalid cookie path")
+            output.append("SameSite="+cookie.sameSite)
+        if ("secure" in cookie && cookie.secure) do
+            output.append("Secure")
+        if ("httponly" in cookie && cookie.httponly) do
+            output.append("HttpOnly")
+        if ("partitioned" in cookie && cookie.partitioned) do
+            output.append("Partitioned")
+        setCookie.append(output.join("; "))
+        res.headers["Set-Cookie"] = setCookie
+        
+    res.next()

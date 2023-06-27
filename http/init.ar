@@ -1,9 +1,11 @@
 import "listener" as listener
 import "logger" as logger
 import "static" as static
+import "cookie" as cookie
 
-static = static.static
-logger = logger.logger
+let cookie = cookie.cookie
+let static = static.static
+let logger = logger.logger
 
 let server() = do
     let class = {}
