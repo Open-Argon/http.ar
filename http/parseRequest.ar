@@ -1,6 +1,13 @@
-let parse(requestData) = do
-    let textData = requestData.to("string")
-    let split = textData.split("\r\n")
+
+let readChunkSize = 1024^2
+
+let methodsWithBody = ["POST", "PUT", "PATCH"]
+
+let parse(conn) = do
+    conn.setTimeout(10000)
+    let headerData = conn.readUntil(buffer().from("\r\n\r\n"))
+    let inBody = false
+    let split = headerData.to("string").split("\r\n")
     let requestLine = split[0].split(" ")
     let method = requestLine[0]
     let path = requestLine[1]
@@ -12,4 +19,19 @@ let parse(requestData) = do
         let name = header[0]
         let value = header[1:].join(": ")
         headers[name] = value
-    return {method: method, path: path, version: version, headers: headers}
+    
+    let body = buffer()
+    if (method in methodsWithBody) do
+        let contentLength = 0
+        if ("Content-Length" in headers) do
+            contentLength = number(headers["Content-Length"])
+        while (not conn.isClosed() && (body.length < contentLength || contentLength == 0)) do
+            try do
+                let chunk = conn.read(readChunkSize)
+                if (chunk.length == 0) break
+                body.append(chunk)
+            catch (e) do
+                term.log(e)
+                break
+    conn.clearTimeout()
+    return {method: method, path: path, version: version, headers: headers, buffer: {header: headerData, body: body}}

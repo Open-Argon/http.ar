@@ -1,4 +1,5 @@
 import "http" as http
+import "http/bleach" as bleach
 
 app = http.server()
 
@@ -7,12 +8,17 @@ app.use(http.logger)
 app.use(http.cookie)
 
 let setCookie(req, res) = do
-    term.log(req.cookies)
-    res.setCookie("test", {value: "test"})
+    if (not ("token" in req.cookies)) do
+        res.setCookie("token", {value: string(random())})
     res.next()
 app.use(setCookie)
 
 app.use(http.static("static"))
+
+let form(req, res) = do
+    term.log(req, res)
+    res.send("<pre>"+bleach.clean(req.buffer.header.to('string'))+bleach.clean(req.buffer.body.to('string'))+"</pre><form method='POST'><input type='text' name='test'><input type='submit'></form>")
+app.route("/form", ['POST'], form)
 
 let api(req, res) = do
     data = "cool"

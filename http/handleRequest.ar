@@ -4,9 +4,9 @@ import "pathCompare" as pathCompare
 import "url" as url
 import "version" as version
 
-let handle(routes, conn, data, onErr) = do
+let handle(routes, conn, onErr) = do
     try do
-        let request = parseRequest.parse(data)
+        let request = parseRequest.parse(conn)
         request.RemoteAddr = conn.RemoteAddr()
         let splitURL = url.split(request.path)
         request.path = splitURL.path

@@ -1,13 +1,10 @@
 import "handleRequest" as handleRequest
 
-let readChunkSize = 1024^2
-
 let listener(Socket, routes, onErr) = do
     while (not Socket.isClosed()) do
         try do
             let conn = Socket.accept()
-            let data = conn.read(readChunkSize)
-            t = thread(()=handleRequest.handle(routes, conn, data, onErr))
+            t = thread(()=handleRequest.handle(routes, conn, onErr))
             t.start()
         catch (e) do
             if (onErr) onErr(e)

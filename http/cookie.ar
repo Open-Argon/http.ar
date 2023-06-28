@@ -57,5 +57,16 @@ let cookie(req, res) = do
             output.append("Partitioned")
         setCookie.append(output.join("; "))
         res.headers["Set-Cookie"] = setCookie
-        
+    res.deleteCookie(name) = do
+        let setCookie = []
+        if ("Set-Cookie" in res.headers) do
+            setCookie = res.headers["Set-Cookie"]
+            if (typeof(setCookie) == "string") do
+                setCookie = [setCookie]
+        let output = [name+"="]
+        output.append("Max-Age=0")
+        output.append("Expires=Thu, 01 Jan 1970 00:00:00 GMT")
+        output.append("Path=/")
+        setCookie.append(output.join("; "))
+        res.headers["Set-Cookie"] = setCookie
     res.next()
