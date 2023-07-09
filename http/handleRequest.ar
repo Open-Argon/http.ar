@@ -29,10 +29,21 @@ let handle(routes, conn, onErr) = do
             for (i from 0 to request.on.headersSent.length) do
                 request.on.headersSent[i]()
         
-        response.sendFile(path) = do
+        response.sendFile(f) = do
+            let path = null
+            let attachment = null
+            if (typeof(f) == "string") do
+                path = f
+            else do
+                path = f.path
+                if ("attachment" in f) do
+                    attachment = f.attachment
             let FILE = file.read(path)
             response.headers["Content-Type"] = FILE.contentType()
-            response.headers["Content-Disposition"] = "inline; filename="+json.stringify(path.split("/")[-1])
+            if (attachment) do
+                response.headers["Content-Disposition"] = "attachment; filename="+attachment
+            else do
+                response.headers["Content-Disposition"] = "inline; filename="+json.stringify(path.split("/")[-1])
             let doRange = "Range" in request.headers
             let FileSize = FILE.size()
             let size = FileSize
@@ -66,7 +77,10 @@ let handle(routes, conn, onErr) = do
                 catch (_) do
                     data = buffer()
             response.close()
-        
+        response.redirect(path) = do
+            response.code = 302
+            response.headers["Location"] = path
+            response.send("")
         response.close() = do
             conn.close()
             for (i from 0 to request.on.end.length) do
@@ -85,13 +99,12 @@ let handle(routes, conn, onErr) = do
             response.send(strdata)
         response.data(data) = do
             response.sendHeaders()
-            conn.write(buffer().from(data))
-            
-        response.send(data) = do
-            response.headers["Connection"] = "close"
-            response.sendHeaders()
             if (conn.isClosed()) return
             conn.write(buffer().from(data))
+            
+        response.send(str) = do
+            response.headers["Connection"] = "close"
+            response.data(buffer().from(str))
             response.close()
         
         let toTry = []

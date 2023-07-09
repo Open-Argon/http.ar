@@ -25,6 +25,10 @@ let api(req, res) = do
     res.json({(data): "Hello, World!", description: "This is a test.", π: π, πRational: fraction(π)})
 app.route("/api", null, api)
 
+let google(req, res) = do
+    res.redirect("https://google.com/")
+app.route("/google", null, google)
+
 let api(req, res) = do
     res.json(req.params)
 app.route("/params/example/<name>", null, api)
@@ -39,12 +43,6 @@ app.route("/wait/<seconds>", null, wait)
 let rand(req, res) = do
     res.json(random())
 app.route("/random", null, rand)
-
-let close(req, res) = do
-    app.close()
-    res.json(true)
-    exit()
-app.route("/close", null, close)
 
 let about(req, res) = do
     res.send("<h1>About</h1>")
