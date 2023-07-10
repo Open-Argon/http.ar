@@ -1,6 +1,6 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-const size = { width: 500, height: 500 };
+const size = { width: 150, height: 150 };
 
 const colourPicker = document.getElementById("colour");
 const colourHex = document.getElementById("colourhex");

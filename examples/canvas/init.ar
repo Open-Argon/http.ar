@@ -26,7 +26,7 @@ let load() = do
 
 let app = http.server()
 
-let size = { width: 500, height: 500 }
+let size = { width: 150, height: 150 }
 
 app.use(http.logger)
 
