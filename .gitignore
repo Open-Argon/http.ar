@@ -1,4 +1,7 @@
 .DS_Store
 
+# isotope
+__isotope__
+
 movie.mp4
 examples/canvas/canvas.json
