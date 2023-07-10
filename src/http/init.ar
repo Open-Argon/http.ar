@@ -1,0 +1,33 @@
+import "listener" as listener
+import "logger" as *
+import "static" as *
+import "cookie" as *
+
+let server() = do
+    let class = {port: 3000, numThreads: 10, callback: ()=term.log("Server running on port "+class.port)}
+    let threads = []
+    let routes = []
+    let Socket = null
+    class.onErr(e) = do
+        term.error(e.type+": "+e.message)
+        term.error(e.code)
+        term.error(e.path+" on line "+e.line)
+    class.run() = do
+        Socket = socket.server("tcp", class.port)
+        for (i from 0 to class.numThreads) do
+            t = thread(()=listener.listener(Socket, routes, class.onErr))
+            threads.append(t)
+            t.start()
+        class.callback()
+        for (i from 0 to threads.length) do
+            threads[i].join()
+    
+    class.close() = Socket.close()
+        
+    class.route(path, methods, callback) = do
+        if (methods == null) do
+            methods = ["GET"]
+        routes.append({path: path, callback: callback, methods: methods, type: "route"})
+    class.use(callback) = do
+        routes.append({callback: callback, type: "middleware"})
+    return class

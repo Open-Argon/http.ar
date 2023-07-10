@@ -1,0 +1,44 @@
+body {
+    background-color: #f0f0f0;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.title {
+    text-align: center;
+    margin: 0;
+    padding: 1rem;
+}
+
+#canvas {
+    display: block;
+    background-color: #ffffff;
+    margin: 0 auto 1rem;
+    padding: 0;
+}
+
+.colourSelect {
+    display: flex;
+    padding: 1rem;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 1rem;
+    background-color: rgb(188, 188, 188);
+    border-radius: 10px;
+}
+
+#colour {
+    border: none;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+#colourhex {
+    background-color: #ffffff;
+    width: 100%;
+    border: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}

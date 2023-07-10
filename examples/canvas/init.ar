@@ -1,0 +1,82 @@
+import "../../src/http" as http
+
+let parent = path.parent(program.file.path)
+
+let saveFile = path.join([parent, "canvas.json"])
+
+let changes = []
+let canvas = []
+
+let save() = do
+    let f = file.write(saveFile)
+    f.json({canvas:canvas, changes: changes})
+let load() = do
+    try do
+        let data = file.read(saveFile).json()
+        canvas = data.canvas
+        changes = data.changes
+    catch (e) do
+        let row = []
+        for (i from 0 to size.width) do
+            row.append(null)
+        for (i from 0 to size.height) do
+            canvas.append(row.copy())
+
+
+
+let app = http.server()
+
+let size = { width: 500, height: 500 }
+
+app.use(http.logger)
+
+let setPixel(x,y, colour) = do
+    if (x >= size.width || y >= size.height) do
+        return
+    canvas[y][x] = colour
+    changes.insert(0, {x: x, y: y, colour: colour, time: time.now().unixMilli()})
+
+load()
+let saveThread() = do
+    forever do
+        time.snooze(30)
+        save()
+let t = thread(saveThread)
+t.start()
+
+let err404path = path.join([parent,"static", "404.html"])
+
+app.use(http.static(path.join([parent,"static"])))
+
+let getCanvas(req, res) = do
+    res.json(canvas)
+
+app.route('/get-canvas', null, getCanvas)
+
+let getCanvasUpdates(req, res) = do
+    if ("lastTime" not in req.query) do
+        res.json(changes)
+        return
+    let lastTime = number(req.query.lastTime)
+    let filtered = []
+    for (i from 0 to changes.length) do
+        if (changes[i].time > lastTime) do
+            filtered.append(changes[i])
+        else break
+    res.json(filtered)
+
+app.route('/get-canvas-updates', null, getCanvasUpdates)
+
+let updatePixel(req, res) = do
+    let data = json.parse(req.buffer.body.to('string'))
+    setPixel(data.x, data.y, data.colour)
+    res.send('200 OK')
+app.route('/update-canvas', ['POST'], updatePixel)
+
+let err404(req, res) = do
+    res.code = 404
+    res.sendFile(err404path)
+app.use(err404)
+
+app.port = 5000
+app.run()

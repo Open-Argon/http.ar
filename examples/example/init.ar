@@ -1,0 +1,22 @@
+import "../../src/http" as http
+import "../../src/bleach" as bleach
+
+let app = http.server()
+
+app.use(http.logger)
+
+let err404path = path.join([path.parent(program.file.path),"static", "404.html"])
+
+app.use(http.static(path.join([path.parent(program.file.path),"static"])))
+
+let form(req, res) = do
+    term.log(req, res)
+    res.send("<pre>"+bleach.clean(req.buffer.header.to('string'))+bleach.clean(req.buffer.body.to('string'))+"</pre><form method='POST'><input type='text' name='test'><input type='submit'></form>")
+app.route("/form", ['POST'], form)
+
+let err404(req, res) = do
+    res.code = 404
+    res.sendFile(err404path)
+app.use(err404)
+
+app.run()
