@@ -1,0 +1,13 @@
+import "../../src" as http
+
+let app = http.server()
+
+app.use(http.logger)
+
+let zipfile = path.join([path.parent(program.file.path), "test.zip"])
+
+let download(req, res) = do
+    res.sendFile(zipfile)
+app.route("/download", null, download)
+
+app.run()

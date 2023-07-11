@@ -1,4 +1,4 @@
-import "../../src/http" as http
+import "../../src" as http
 
 let parent = path.parent(program.file.path)
 
