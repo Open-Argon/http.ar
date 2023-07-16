@@ -4,7 +4,7 @@ import "static" as *
 import "cookie" as *
 
 let server() = do
-    let class = {port: 3000, numThreads: 10, callback: ()=term.log("Server running on port "+class.port)}
+    let class = {port: 3000, numThreads: 1, callback: ()=term.log("Server running on port "+class.port)}
     let threads = []
     let routes = []
     let Socket = null
@@ -13,6 +13,8 @@ let server() = do
         term.error(e.code)
         term.error(e.path+" on line "+e.line)
     class.run() = do
+        if (Socket != null) do
+            throwError("Server already running")
         Socket = socket.server("tcp", class.port)
         for (i from 0 to class.numThreads) do
             t = thread(()=listener.listener(Socket, routes, class.onErr))

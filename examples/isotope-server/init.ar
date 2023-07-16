@@ -1,13 +1,21 @@
 import "../../src" as http
+import "../../src/url" as url
 
 let app = http.server()
 
+let files = {'http.ar': path.join([path.parent(program.file.path), "modules", "http.tar.gz"])}
+
 app.use(http.logger)
 
-let zipfile = path.join([path.parent(program.file.path), "test.zip"])
 
 let download(req, res) = do
+    
+    let zipfile = files[req.query.name]
     res.sendFile(zipfile)
-app.route("/download", null, download)
+app.route("/isotope-download", null, download)
+
+let search(req, res) = do
+    res.json({Name: "http.ar", Version: "1.0.0", URL: "http://localhost:3000/isotope-download?"+url.queryStr({name: "http.ar", version: "1.0.0"})})
+app.route("/isotope-search", null, search)
 
 app.run()

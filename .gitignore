@@ -3,5 +3,8 @@
 # isotope
 __isotope__
 
+# argon
+argon_modules
+
 movie.mp4
 examples/canvas/canvas.json

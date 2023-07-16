@@ -40,6 +40,13 @@ let split(url) = do
                 query[decode(queryItem[0])] = decode(queryItem[1])
         return {path: split[0], query: query}
 
+let queryStr(query) = do
+    let queryStr = []
+    let keys = query.keys()
+    for (i from 0 to keys.length) do
+        queryStr.append(encode(keys[i])+"="+encode(query[keys[i]]))
+    return queryStr.join("&")
+
 
 let URL(url) = do
     let protocol = null
