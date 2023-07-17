@@ -2,6 +2,7 @@ import "listener" as listener
 import "logger" as *
 import "static" as *
 import "cookie" as *
+import "formdata" as *
 
 let server() = do
     let class = {port: 3000, numThreads: 1, callback: ()=term.log("Server running on port "+class.port)}

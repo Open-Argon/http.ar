@@ -1,18 +1,25 @@
 import "../../src" as http
-import "../../src/bleach" as bleach
 
 let app = http.server()
 
 app.use(http.logger)
 
+app.use(http.formdata)
+
 let err404path = path.join([path.parent(program.file.path),"static", "404.html"])
 
-app.use(http.static(path.join([path.parent(program.file.path),"static"])))
+app.use(http.static("/",path.join([path.parent(program.file.path),"static"])))
 
 let form(req, res) = do
     term.log(req, res)
-    res.send("<pre>"+bleach.clean(req.buffer.header.to('string'))+bleach.clean(req.buffer.body.to('string'))+"</pre><form method='POST'><input type='text' name='test'><input type='submit'></form>")
-app.route("/form", ['POST'], form)
+    if (req.method == "POST") do
+        term.log(req.formdata)
+        term.log(req.files)
+        res.send("POST")
+        return
+    
+    res.send("<form method='POST' enctype='multipart/form-data'><input type='text' name='text'><input type='file' name='file'><input type='submit'></form>")
+app.route("/form", ['GET','POST'], form)
 
 let err404(req, res) = do
     res.code = 404

@@ -46,7 +46,7 @@ t.start()
 
 let err404path = path.join([parent,"static", "404.html"])
 
-app.use(http.static(path.join([parent,"static"])))
+app.use(http.static("/",path.join([parent,"static"])))
 
 let getCanvas(req, res) = do
     res.json(canvas)
