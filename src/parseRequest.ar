@@ -4,7 +4,6 @@ let readChunkSize = 1024^2
 let methodsWithBody = ["POST", "PUT", "PATCH"]
 
 let parse(conn) = do
-    conn.setTimeout(10000)
     let headerData = conn.readUntil(buffer().from("\r\n\r\n"))
     let inBody = false
     let split = headerData.to("string").split("\r\n")
@@ -33,5 +32,4 @@ let parse(conn) = do
             catch (e) do
                 term.log(e)
                 break
-    conn.clearTimeout()
     return {method: method, path: path, version: version, headers: headers, buffer: {header: headerData, body: body}}

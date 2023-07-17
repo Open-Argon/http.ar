@@ -1,5 +1,5 @@
 let __multipart(req, res) = do
-    let boundary = buffer().from(req.headers["Content-Type"].split("boundary=")[1])
+    let boundary = buffer().from(req.headers["Content-Type"].splitN("boundary=")[1])
     let newLineSplit = buffer().from("\r\n\r\n")
     let parts = req.buffer.body.split(boundary)
     for (i from 0 to parts.length) do
@@ -27,7 +27,7 @@ let __multipart(req, res) = do
                     req.files[name].data = body
                     let save(path) = do
                         let file = file.write(path)
-                        file.write(body)
+                        file.buffer(body)
                         file.close()
                     req.files[name].save = save
                 else do
