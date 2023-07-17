@@ -1,5 +1,3 @@
-import "caseInsensitive" as *
-
 let readChunkSize = 1024^2
 
 let methodsWithBody = ["POST", "PUT", "PATCH"]

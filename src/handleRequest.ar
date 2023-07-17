@@ -16,7 +16,7 @@ let handle(routes, conn, onErr) = do
         request.on.end = []
         let bufferSize = 1024*1024*10
         request.headersSent = false
-        let response = {code:200, headers:{"content-type": "text/html; charset=utf-8", "Server": "http.ar/"+version.version+" Argon/"+ArgonVersion}}
+        let response = {code:200, headers:{"content-type": "text/html; charset=utf-8", "server": "http.ar/"+version.version+" Argon/"+ArgonVersion}}
         
         request.isClosed = conn.isClosed
 
@@ -39,17 +39,17 @@ let handle(routes, conn, onErr) = do
                 if ("attachment" in f) do
                     attachment = f.attachment
             let FILE = file.read(path)
-            response.headers["Content-Type"] = FILE.contentType()
+            response.headers["content-type"] = FILE.contentType()
             if (attachment) do
-                response.headers["Content-Disposition"] = "attachment; filename="+attachment
+                response.headers["content-disposition"] = "attachment; filename="+attachment
             else do
-                response.headers["Content-Disposition"] = "inline; filename="+json.stringify(path.split("/")[-1])
+                response.headers["content-disposition"] = "inline; filename="+json.stringify(path.split("/")[-1])
             let doRange = "Range" in request.headers
             let FileSize = FILE.size()
             let size = FileSize
             if (doRange) do
                 response.code = 206
-                let range = request.headers["Range"].split("=")[1].split("-")
+                let range = request.headers["range"].split("=")[1].split("-")
                 let start = number(range[0])
                 let end = 0
                 if (range.length > 1 && range[1] != "") do
@@ -60,9 +60,9 @@ let handle(routes, conn, onErr) = do
                     end = size
                 FILE.seek(start)
                 size = end - start
-                response.headers["Content-Range"] = "bytes "+fraction(start)[:-2]+"-"+fraction(end)[:-2]+"/"+fraction(FileSize)[:-2]
-                response.headers["Accept-Ranges"] = "bytes"
-            response.headers["Content-Length"] = fraction(size)[:-2]
+                response.headers["content-range"] = "bytes "+fraction(start)[:-2]+"-"+fraction(end)[:-2]+"/"+fraction(FileSize)[:-2]
+                response.headers["accept-ranges"] = "bytes"
+            response.headers["content-length"] = fraction(size)[:-2]
             let sizeLeft = size
             response.sendHeaders()
             let LocalBufferSize = min([bufferSize, sizeLeft])
@@ -79,7 +79,7 @@ let handle(routes, conn, onErr) = do
             response.close()
         response.redirect(path) = do
             response.code = 302
-            response.headers["Location"] = path
+            response.headers["location"] = path
             response.send("")
         response.close() = do
             conn.close()
@@ -90,12 +90,12 @@ let handle(routes, conn, onErr) = do
             if (onErr) onErr(err)
             else term.log(err)
             response.code = 500
-            response.headers = {"Content-Type": "text/html; charset=utf-8", "Server": "http.ar/"+version.version+" Argon/"+ArgonVersion}
+            response.headers = {"content-type": "text/html; charset=utf-8", "server": "http.ar/"+version.version+" Argon/"+ArgonVersion}
             response.send("<h1>500 Internal Server Error</h1>")
 
         response.json(data) = do
             let strdata = json.stringify(data)
-            response.headers["Content-Type"] = "application/json"
+            response.headers["content-type"] = "application/json"
             response.send(strdata)
         response.data(data) = do
             response.sendHeaders()
@@ -103,7 +103,7 @@ let handle(routes, conn, onErr) = do
             conn.write(buffer().from(data))
             
         response.send(str) = do
-            response.headers["Connection"] = "close"
+            response.headers["connection"] = "close"
             response.data(buffer().from(str))
             response.close()
         

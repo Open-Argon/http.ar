@@ -9,7 +9,7 @@ let cookie(req, res) = do
     let cookies = {}
 
     if ("Cookie" in req.headers) do
-        let cookie = req.headers["Cookie"]
+        let cookie = req.headers["cookie"]
         cookie = cookie.split("; ")
         for (i from 0 to cookie.length) do
             let c = cookie[i].split("=")
