@@ -16,7 +16,7 @@ let handle(routes, conn, onErr) = do
         request.on.end = []
         let bufferSize = 1024*1024*10
         request.headersSent = false
-        let response = {code:200, headers:{"Content-Type": "text/html; charset=utf-8", "Server": "http.ar/"+version.version+" Argon/"+ArgonVersion}}
+        let response = {code:200, headers:{"content-type": "text/html; charset=utf-8", "Server": "http.ar/"+version.version+" Argon/"+ArgonVersion}}
         
         request.isClosed = conn.isClosed
 

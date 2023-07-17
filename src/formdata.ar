@@ -1,5 +1,5 @@
 let __multipart(req, res) = do
-    let boundary = buffer().from(req.headers["Content-Type"].splitN("boundary=", 2)[1])
+    let boundary = buffer().from(req.headers["content-type"].splitN("boundary=", 2)[1])
     let newLineSplit = buffer().from("\r\n\r\n")
     let parts = req.buffer.body.split(boundary)
     for (i from 0 to parts.length) do
@@ -24,7 +24,7 @@ let __multipart(req, res) = do
                 if (disposition.length >= 3) do
                     req.files[name] = {}
                     req.files[name].name = json.parse(disposition[2].splitN("=", 2)[1])
-                    req.files[name].type = headers["Content-Type"]
+                    req.files[name].type = headers["content-type"]
                     req.files[name].data = body
                     let save(path) = do
                         let file = file.write(path)
@@ -41,6 +41,6 @@ let formdata(req, res) = do
     req.files = {}
 
     if (req.method != "POST") return res.next()
-    if ("Content-Type" in req.headers && req.headers["Content-Type"].startswith("multipart/form-data")) do
+    if ("content-type" in req.headers && req.headers["content-type"].startswith("multipart/form-data")) do
         return __multipart(req, res)
     res.next()
