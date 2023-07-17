@@ -3,6 +3,8 @@ let readChunkSize = 1024^2
 
 let methodsWithBody = ["POST", "PUT", "PATCH"]
 
+let caseInsensitive = ['accept', 'accept-encoding', 'accept-language', 'cache-control', 'connection', 'content-encoding', 'content-language', 'content-length', 'content-location', 'content-type', 'date', 'host', 'if-match', 'if-none-match', 'if-range', 'if-unmodified-since', 'last-modified', 'location', 'referer', 'user-agent']
+
 let parse(conn) = do
     let headerData = conn.readUntil(buffer().from("\r\n\r\n"))
     let inBody = false
@@ -13,17 +15,21 @@ let parse(conn) = do
     let version = requestLine[2]
     let headers = {}
     for (i from 1 to split.length) do
-        let header = split[i].split(": ")
+        let header = split[i].splitN(": ", 2)
         if (header.length < 2) break
         let name = header[0]
-        let value = header[1:].join(": ")
+        let value = header[1]
+        let lowered = name.lower()
+        if (lowered in caseInsensitive) do
+            name = lowered
+            value = value.lower()
         headers[name] = value
     
     let body = buffer()
     if (method in methodsWithBody) do
         let contentLength = 0
-        if ("Content-Length" in headers) do
-            contentLength = number(headers["Content-Length"])
+        if ("content-length" in headers) do
+            contentLength = number(headers["content-length"])
         while ((not conn.isClosed()) && (body.length < contentLength || contentLength == 0)) do
             try do
                 let chunk = conn.read(readChunkSize)

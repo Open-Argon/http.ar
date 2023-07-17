@@ -1,5 +1,5 @@
 let __multipart(req, res) = do
-    let boundary = buffer().from(req.headers["Content-Type"].splitN("boundary=")[1])
+    let boundary = buffer().from(req.headers["Content-Type"].splitN("boundary=", 2)[1])
     let newLineSplit = buffer().from("\r\n\r\n")
     let parts = req.buffer.body.split(boundary)
     for (i from 0 to parts.length) do
@@ -7,7 +7,6 @@ let __multipart(req, res) = do
         if (str == "" || str=="--" || str=="--\r\n") continue
         str = null
         let headers = {}
-        let body = buffer()
         let lines = parts[i].splitN(newLineSplit, 2)
         let headerLines = lines[0].to("string").split("\r\n")
         for (j from 0 to headerLines.length) do
@@ -15,7 +14,9 @@ let __multipart(req, res) = do
             if (header.length != 2) continue
             headers[header[0]] = header[1]
         if (lines.length != 2) continue
-        body.append(lines[1].slice(0,lines[1].length-4))
+        let body = lines[1]
+        if (i != parts.length-1) do
+            body = body.slice(0, body.length-4)
         if ("Content-Disposition" in headers) do
             let disposition = headers["Content-Disposition"].split("; ")
             if (disposition[0] == "form-data") do
