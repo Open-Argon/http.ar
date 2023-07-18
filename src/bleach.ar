@@ -1,1 +1,0 @@
-let clean(text) = text.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\"","&quot;").replace("'","&#039;")
