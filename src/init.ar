@@ -3,6 +3,15 @@ import "logger" as *
 import "static" as *
 import "cookie" as *
 import "formdata" as *
+import "debug" as __debug
+
+let setDebug(value) = do
+    if (__debug.inDebug == value) return
+    __debug.inDebug = value
+    if (value) do
+        term.log("Debug mode enabled")
+    else do
+        term.log("Debug mode disabled")
 
 let server() = do
     let class = {port: 3000, numThreads: 1, callback: ()=term.log("Server running on port "+class.port)}

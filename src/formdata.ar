@@ -1,3 +1,14 @@
+import "url" as url
+
+let __makeFile(name, type, data) = do
+    let File = {name: name, type: type, data: data}
+    let save(path) = do
+        let file = file.write(path)
+        file.buffer(data)
+        file.close()
+    File.save = save
+    return File
+
 let __multipart(req, res) = do
     let boundary = buffer().from(req.headers["content-type"].splitN("boundary=", 2)[1])
     let newLineSplit = buffer().from("\r\n\r\n")
@@ -22,15 +33,8 @@ let __multipart(req, res) = do
             if (disposition[0] == "form-data") do
                 let name = json.parse(disposition[1].splitN("=", 2)[1])
                 if (disposition.length >= 3) do
-                    req.files[name] = {}
-                    req.files[name].name = json.parse(disposition[2].splitN("=", 2)[1])
-                    req.files[name].type = headers["content-type"]
-                    req.files[name].data = body
-                    let save(path) = do
-                        let file = file.write(path)
-                        file.buffer(body)
-                        file.close()
-                    req.files[name].save = save
+                    let filename = json.parse(disposition[2].splitN("=", 2)[1])
+                    req.files[name] = __makeFile(filename, headers["content-type"], body)
                 else do
                     req.formdata[name] = body.to("string")
     res.next()
@@ -41,6 +45,10 @@ let formdata(req, res) = do
     req.files = {}
 
     if (req.method != "POST") return res.next()
-    if ("content-type" in req.headers && req.headers["content-type"].lower().startswith("multipart/form-data")) do
-        return __multipart(req, res)
+    if ("content-type" not in req.headers) return res.next()
+    let loweredContentType = req.headers["content-type"].lower()
+    if (loweredContentType.startswith("multipart/form-data")) return __multipart(req, res)
+    else if (loweredContentType.startswith("application/x-www-form-urlencoded")) req.formdata = url.decodeURLQuery(req.buffer.body.to("string"))
+    else if (loweredContentType.startswith("application/json")) req.formdata = json.parse(req.buffer.body.to("string"))
+    else req.files.file = __makeFile("file", req.headers["content-type"], req.buffer.body)
     res.next()

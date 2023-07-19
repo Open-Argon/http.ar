@@ -13,7 +13,7 @@ let parse(conn) = do
     let headers = {}
     for (i from 1 to split.length) do
         let header = split[i].splitN(": ", 2)
-        if (header.length < 2) break
+        if (header.length != 2) break
         let name = header[0].lower()
         let value = header[1]
         headers[name] = value

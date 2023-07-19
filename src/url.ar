@@ -24,21 +24,20 @@ let encode(data) = do
         i = i + 1
     return encoded.join("")
 
+let decodeURLQuery(querytext) = do
+    let query = {}
+    let querySplit = querytext.split("&")
+    for (i from 0 to querySplit.length) do
+        let queryItem = querySplit[i].splitN("=", 2)
+        let nameDecoded = decode(queryItem[0])
+        if (queryItem.length != 2) query[nameDecoded] = ""
+        else query[nameDecoded] = decode(queryItem[1])
+    return query
+
 let split(url) = do
-    let split = url.split("?")
-    if (split.length == 1) do
-        return {path: split[0], query: {}}
-    else do
-        querytext = split[1:].join("?")
-        let query = {}
-        let querySplit = querytext.split("&")
-        for (i from 0 to querySplit.length) do
-            let queryItem = querySplit[i].split("=")
-            if (queryItem.length == 1) do
-                query[decode(queryItem[0])] = ""
-            else do
-                query[decode(queryItem[0])] = decode(queryItem[1])
-        return {path: split[0], query: query}
+    let split = url.splitN("?", 2)
+    if (split.length != 2) return {path: split[0], query: {}}
+    else return {path: split[0], query: decodeURLQuery(split[1])}
 
 let queryStr(query) = do
     let queryStr = []

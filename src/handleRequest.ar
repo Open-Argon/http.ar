@@ -3,6 +3,7 @@ import "parseRequest" as parseRequest
 import "pathCompare" as pathCompare
 import "url" as url
 import "version" as version
+import "renderTemplate" as renderTemplate
 
 let handle(routes, conn, onErr) = do
     try do
@@ -85,7 +86,8 @@ let handle(routes, conn, onErr) = do
             conn.close()
             for (i from 0 to request.on.end.length) do
                 request.on.end[i]()
-        
+        response.renderTemplate(path, values) = do
+            response.send(renderTemplate.renderTemplate(path, values))
         response.onErr(err) = do
             if (onErr) onErr(err)
             else term.log(err)
