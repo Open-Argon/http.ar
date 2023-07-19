@@ -5,8 +5,8 @@ let templates = {}
 
 let templatesPath = path.join([program.cwd, "templates"])
 
-let renderTemplate(path, values) = do
-    if (path in templates && (not debug.inDebug)) return templates[path].render(values)
-    let template = neon.template(path)
-    if (not debug.inDebug) templates[path] = template
+let renderTemplate(document, values) = do
+    if (path in templates && (not debug.inDebug)) return templates[document].render(values)
+    let template = neon.template(path.join([templatesPath,document]))
+    if (not debug.inDebug) templates[document] = template
     return template.render(values)
