@@ -1,3 +1,5 @@
+import "handleRequest" as handleRequest
+
 let static(root, path) = do
     if (root == "/") root = ""
     let middleware(req, res) = do
@@ -12,5 +14,6 @@ let static(root, path) = do
             catch (_) do
                 continue
         if (req.isClosed()) return
+        res.headers = handleRequest.__initHeaders()
         res.next()
     return middleware
