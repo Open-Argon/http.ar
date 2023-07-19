@@ -1,4 +1,5 @@
 let static(root, path) = do
+    if (root == "/") root = ""
     let middleware(req, res) = do
         if (req.method != "GET") return res.next()
         if (not req.path.startswith(root)) return res.next()
