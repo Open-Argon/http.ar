@@ -1,4 +1,4 @@
-import "url" as url
+import "url.ar" as url
 
 let __makeFile(name, type, data) = do
     let File = {name: name, type: type, data: data}
