@@ -48,7 +48,7 @@ let handle(routes, conn, onErr) = do
                 response.headers["content-disposition"] = "attachment; filename="+attachment
             else do
                 response.headers["content-disposition"] = "inline; filename="+json.stringify(path.split("/")[-1])
-            let doRange = "Range" in request.headers
+            let doRange = "range" in request.headers
             let FileSize = FILE.size()
             let size = FileSize
             if (doRange) do
@@ -68,6 +68,7 @@ let handle(routes, conn, onErr) = do
                 response.headers["accept-ranges"] = "bytes"
             response.headers["content-length"] = fraction(size)[:-2]
             let sizeLeft = size
+            term.log(response.headers)
             response.sendHeaders()
             let LocalBufferSize = min([bufferSize, sizeLeft])
             let data = FILE.buffer(LocalBufferSize)
