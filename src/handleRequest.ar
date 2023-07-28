@@ -68,7 +68,6 @@ let handle(routes, conn, onErr) = do
                 response.headers["accept-ranges"] = "bytes"
             response.headers["content-length"] = fraction(size)[:-2]
             let sizeLeft = size
-            term.log(response.headers)
             response.sendHeaders()
             let LocalBufferSize = min([bufferSize, sizeLeft])
             let data = FILE.buffer(LocalBufferSize)
