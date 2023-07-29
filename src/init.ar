@@ -31,8 +31,6 @@ let server() = do
             threads.append(t)
             t.start()
         class.callback()
-        for (i from 0 to threads.length) do
-            threads[i].join()
     
     class.close() = Socket.close()
         
