@@ -2,7 +2,7 @@ let disallowed_chars = [';', ',', ' ', '\n', '\r', '\t']
 
 let valid(value) = do
     for (i from 0 to value.length) do
-        if (value[i] in validChars) return false
+        if (value[i] in disallowed_chars) return false
     return true
 
 let cookie(req, res) = do
