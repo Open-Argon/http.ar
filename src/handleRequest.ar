@@ -91,10 +91,10 @@ let handle(routes, conn, onErr) = do
                 request.on.end[i]()
         response.templateValues = {}
         response.renderTemplate(path, values) = do
-            let keys = values.keys()
+            let keys = response.templateValues.keys()
             for (i from 0 to keys.length) do
-                response.templateValues[keys[i]] = values[keys[i]]
-            response.send(renderTemplate.renderTemplate(path, response.templateValues))
+                if (keys[i] not in values) values[keys[i]] = response.templateValues[keys[i]]
+            response.send(renderTemplate.renderTemplate(path, values))
         response.onErr(err) = do
             if (onErr) onErr(err)
             else term.log(err)
