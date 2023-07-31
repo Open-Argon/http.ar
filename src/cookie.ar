@@ -1,8 +1,8 @@
-let validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'*+-.^_`|~"
+let disallowed_chars = [';', ',', ' ', '\n', '\r', '\t']
 
 let valid(value) = do
     for (i from 0 to value.length) do
-        if (value[i] not in validChars) return false
+        if (value[i] in validChars) return false
     return true
 
 let cookie(req, res) = do
