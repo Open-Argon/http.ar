@@ -27,10 +27,11 @@ let server() = do
             throwError("Server already running")
         Socket = socket.server("tcp", class.port)
         for (i from 0 to class.numThreads) do
-            t = thread(()=listener.listener(Socket, routes, class.onErr))
+            let t = thread(()=listener.listener(Socket, routes, class.onErr))
             threads.append(t)
             t.start()
-        class.callback()
+        let t = thread(()=class.callback())
+        t.start()
     
     class.close() = Socket.close()
         
