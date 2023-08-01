@@ -22,10 +22,10 @@ let parse(conn) = do
     
     let body = buffer()
     if (method in methodsWithBody) do
-        let contentLength = 0
+        let contentLength = -1
         if ("content-length" in headers) do
             contentLength = number(headers["content-length"])
-        while ((not conn.isClosed()) && (body.length < contentLength || contentLength == 0)) do
+        while ((not conn.isClosed()) && (body.length < contentLength || contentLength == -1)) do
             try do
                 let chunk = conn.read(readChunkSize)
                 if (chunk.length == 0) break
