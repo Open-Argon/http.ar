@@ -1,4 +1,4 @@
-let disallowed_chars = [';', ',', ' ', '\n', '\r', '\t']
+let disallowed_chars = [';', ',', '\n', '\r', '\t']
 
 let valid(value) = do
     for (i from 0 to value.length) do
