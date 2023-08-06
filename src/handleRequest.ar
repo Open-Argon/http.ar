@@ -128,7 +128,7 @@ let handle(routes, conn, onErr) = do
                     toTry.append(route)
         let trying = -1
         let next() = do
-            trying = trying + 1
+            trying += 1
             if (trying < toTry.length) do
                 let route = toTry[trying]
                 if ("params" in route) do
