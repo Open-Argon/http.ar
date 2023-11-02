@@ -26,7 +26,7 @@ const addPixel = (x, y, colour) => {
 new Event("colour-change");
 
 let pixels = [];
-let updatesSince = new Date();
+let updatesSince;
 
 const resize = () => {
     const { innerWidth, innerHeight } = window;
@@ -55,26 +55,25 @@ const draw = () => {
 const getCanvas = async () => {
     const resp = await fetch("/get-canvas");
     const data = await resp.json();
-    pixels = data;
+    updatesSince = data.time
+    pixels = data.canvas;
 };
 
 const getUpdates = async () => {
     const url = new URL("/get-canvas-updates", window.location.href);
-    url.searchParams.append("lastTime", updatesSince.getTime());
+    url.searchParams.append("lastTime", updatesSince);
     const resp = await fetch(url);
     const data = await resp.json();
-    for (const update of data) {
+    for (const update of data.updates) {
         addPixel(update.x, update.y, update.colour);
     }
-    updatesSince = new Date();
+    updatesSince = data.time
 };
 
 canvas.addEventListener("click", async (e) => {
     const pixelsize = canvas.width / size.width;
     const x = Math.floor(e.offsetX / pixelsize);
     const y = Math.floor(e.offsetY / pixelsize);
-    addPixel(x, y, currentColour);
-    updatesSince = new Date();
     await fetch("/update-canvas", {
         method: "POST",
         headers: {
@@ -86,6 +85,7 @@ canvas.addEventListener("click", async (e) => {
             colour: currentColour,
         }),
     });
+    getUpdates()
 });
 
 resize();
