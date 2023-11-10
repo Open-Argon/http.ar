@@ -12,7 +12,7 @@ let handle(routes, conn, onErr) = do
     try do
         let request = parseRequest.parse(conn)
         if (not request) return
-        request.RemoteAddr = conn.RemoteAddr()
+        request.RemoteAddr = conn.RemoteAddr().splitN(":", 2)[0]
         let splitURL = url.split(request.path)
         request.path = splitURL.path
         request.query = splitURL.query

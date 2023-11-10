@@ -7,9 +7,7 @@ let parse(conn) = do
     let inBody = false
     let split = headerData.to("string").split("\r\n")
     let requestLine = split[0].split(" ")
-    if (requestLine.length != 3) do
-        if (conn.isClosed()) throwError("requestError","Invalid request line")
-        return
+    if (requestLine.length != 3) return
     let method = requestLine[0]
     let path = requestLine[1]
     let version = requestLine[2]
