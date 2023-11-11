@@ -44,6 +44,7 @@ let server() = do
         class.put(callback) = routes.append({path: path, callback: callback, methods: ["PUT"], type: "route"})
         class.delete(callback) = routes.append({path: path, callback: callback, methods: ["DELETE"], type: "route"})
         class.all(callback) = routes.append({path: path, callback: callback, methods: true, type: "route"})
+        return class
     class.get(path, callback) = class.route(path).get(callback)
     class.post(path, callback) = class.route(path).post(callback)
     class.put(path, callback) = class.route(path).put(callback)
