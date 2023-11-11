@@ -37,9 +37,16 @@ let server() = do
     
     class.close() = Socket.close()
         
-    class.route(path, methods, callback) = do
-        if (methods == null) do
-            methods = ["GET"]
-        routes.append({path: path, callback: callback, methods: methods, type: "route"})
+    class.route(path) = do
+        let class = {}
+        class.get(callback) = routes.append({path: path, callback: callback, methods: ["GET"], type: "route"})
+        class.post(callback) = routes.append({path: path, callback: callback, methods: ["POST"], type: "route"})
+        class.put(callback) = routes.append({path: path, callback: callback, methods: ["PUT"], type: "route"})
+        class.delete(callback) = routes.append({path: path, callback: callback, methods: ["DELETE"], type: "route"})
+        class.all(callback) = routes.append({path: path, callback: callback, methods: true, type: "route"})
+    class.get(path, callback) = class.route(path).get(callback)
+    class.post(path, callback) = class.route(path).post(callback)
+    class.put(path, callback) = class.route(path).put(callback)
+    class.all(path, callback) = class.route(path).all(callback)
     class.use(callback) = routes.append({callback: callback, type: "middleware"})
     return class

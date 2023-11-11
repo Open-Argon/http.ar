@@ -19,7 +19,7 @@ let handle(routes, conn, onErr) = do
         request.on = {}
         request.on.headersSent = []
         request.on.end = []
-        let bufferSize = 1024*1024*10
+        let bufferSize = 10485760
         request.headersSent = false
         let response = {code:200, headers:__initHeaders()}
         
@@ -31,8 +31,7 @@ let handle(routes, conn, onErr) = do
             let response_data = buildResponse.build(response.headers, response.code, "")
             request.headersSent = true
             conn.write(buffer().from(response_data))
-            for (i from 0 to request.on.headersSent.length) do
-                request.on.headersSent[i]()
+            for (i from 0 to request.on.headersSent.length)request.on.headersSent[i]()
         
         response.sendFile(f) = do
             let path = null
@@ -134,7 +133,7 @@ let handle(routes, conn, onErr) = do
             trying += 1
             if (trying < toTry.length) do
                 let route = toTry[trying]
-                if ("params" in route) do
+                if (route == true || "params" in route) do
                     request.params = route.params
                 else do
                     request.params = {}

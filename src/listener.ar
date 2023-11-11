@@ -1,10 +1,5 @@
 import "handleRequest" as handleRequest
 
 let listener(Socket, routes, onErr) = do
-    while (not Socket.isClosed()) do
-        try do
-            let conn = Socket.accept()
-            t = thread(()=handleRequest.handle(routes, conn, onErr))
-            t.start()
-        catch (e) do
-            if (onErr) onErr(e)
+    while (not Socket.isClosed()) try thread(()=handleRequest.handle(routes, Socket.accept(), onErr)).start()
+                                  catch (e) if (onErr) onErr(e)
