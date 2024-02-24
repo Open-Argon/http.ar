@@ -19,7 +19,7 @@ let form(req, res) = do
         return
     
     res.send("<form method='POST' enctype='multipart/form-data'><input type='text' name='text'><input type='file' name='file'><input type='submit'></form>")
-app.route("/form", ['GET','POST'], form)
+app.all("/form", form)
 
 let err404(req, res) = do
     res.code = 404

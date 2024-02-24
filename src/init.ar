@@ -27,7 +27,7 @@ let server() = do
             throwError("Server already running")
         let starter() = do
             Socket = socket.server("tcp", class.port)
-            listener.listener(Socket, routes, class.onErr)
+            thread(()=listener.listener(Socket, routes, class.onErr)).start()
             class.callback()
         let t = thread(starter)
         t.start()

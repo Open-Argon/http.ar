@@ -48,7 +48,7 @@ let err404path = path.join([parent,"static", "404.html"])
 
 app.use(http.static("/",path.join([parent,"static"])))
 
-app.route('/get-canvas', null, (req, res) = res.json({canvas:canvas, time:time.now()}))
+app.get('/get-canvas', (req, res) = res.json({canvas:canvas, time:time.now()}))
 
 let getCanvasUpdates(req, res) = do
     if ("lastTime" not in req.query) do
@@ -62,13 +62,13 @@ let getCanvasUpdates(req, res) = do
         else break
     res.json({updates:filtered, time:time.now()})
 
-app.route('/get-canvas-updates', null, getCanvasUpdates)
+app.get('/get-canvas-updates', getCanvasUpdates)
 
 let updatePixel(req, res) = do
     let data = json.parse(req.buffer.body.to('string'))
     setPixel(data.x, data.y, data.colour)
     res.send('200 OK')
-app.route('/update-canvas', ['POST'], updatePixel)
+app.post('/update-canvas', updatePixel)
 
 let err404(req, res) = do
     res.code = 404
