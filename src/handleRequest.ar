@@ -123,7 +123,7 @@ let handle(routes, conn, onErr) = do
             let route = routes[i]
             if (route.type == "middleware") do
                 toTry.append(route)
-            else if (request.method in route.methods) do
+            else if (route.methods == true || request.method in route.methods) do
                 let comparison = pathCompare.compare(route.path, request.path)
                 if (comparison.match) do
                     route.params = comparison.params
