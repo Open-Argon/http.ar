@@ -6,7 +6,7 @@ import "version" as version
 import "renderTemplate" as renderTemplate
 import "contentType" as contentType
 
-let __initHeaders() = {"content-type": "text/html; charset=utf-8", "Content-Security-Policy":"default-src 'self'", "server": "http.ar/"+version.version+" Argon/"+ArgonVersion}
+let __initHeaders() = {"content-type": "text/html; charset=utf-8", "server": "http.ar/"+version.version+" Argon/"+ArgonVersion}
 
 let handle(routes, conn, onErr) = do
     try do
