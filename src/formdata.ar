@@ -14,7 +14,7 @@ let __multipart(req, res) = do
     let newLineSplit = buffer().from("\r\n\r\n")
     let parts = req.buffer.body.split(boundary)
     for (i from 0 to parts.length) do
-        let str = (parts[i].to("string"))
+        let str = parts[i].to("string")
         if (str == "" || str=="--" || str=="--\r\n") continue
         str = null
         let headers = {}

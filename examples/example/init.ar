@@ -12,14 +12,12 @@ app.use(http.static("/",path.join([path.parent(program.file.path),"static"])))
 
 let form(req, res) = do
     term.log(req, res)
-    if (req.method == "POST") do
-        term.log(req.formdata)
-        term.log(req.files)
-        res.send("POST")
-        return
-    
     res.send("<form method='POST' enctype='multipart/form-data'><input type='text' name='text'><input type='file' name='file'><input type='submit'></form>")
-app.all("/form", form)
+let form_post(req, res) = do
+    term.log(req.formdata)
+    term.log(req.files)
+    res.send("POST")
+app.route("/form").get(form).post(form_post)
 
 let err404(req, res) = do
     res.code = 404

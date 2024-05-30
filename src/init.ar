@@ -25,8 +25,8 @@ let server() = do
     class.run() = do
         if (Socket != null) do
             throwError("Server already running")
+        Socket = socket.server("tcp", class.port)
         let starter() = do
-            Socket = socket.server("tcp", class.port)
             thread(()=listener.listener(Socket, routes, class.onErr)).start()
             class.callback()
         let t = thread(starter)
@@ -36,11 +36,21 @@ let server() = do
         
     class.route(path) = do
         let class = {}
-        class.get(callback) = routes.append({path: path, callback: callback, methods: ["GET"], type: "route"})
-        class.post(callback) = routes.append({path: path, callback: callback, methods: ["POST"], type: "route"})
-        class.put(callback) = routes.append({path: path, callback: callback, methods: ["PUT"], type: "route"})
-        class.delete(callback) = routes.append({path: path, callback: callback, methods: ["DELETE"], type: "route"})
-        class.all(callback) = routes.append({path: path, callback: callback, methods: true, type: "route"})
+        class.get(callback) = do
+            routes.append({path: path, callback: callback, methods: ["GET"], type: "route"})
+            return class
+        class.post(callback) = do
+            routes.append({path: path, callback: callback, methods: ["POST"], type: "route"})
+            return class
+        class.put(callback) = do
+            routes.append({path: path, callback: callback, methods: ["PUT"], type: "route"})
+            return class
+        class.delete(callback) = do
+            routes.append({path: path, callback: callback, methods: ["DELETE"], type: "route"})
+            return class
+        class.all(callback) = do
+            routes.append({path: path, callback: callback, methods: true, type: "route"})
+            return class
         return class
     class.get(path, callback) = class.route(path).get(callback)
     class.post(path, callback) = class.route(path).post(callback)

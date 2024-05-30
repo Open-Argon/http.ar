@@ -1,0 +1,11 @@
+import "../../src" as http
+
+let app = http.server()
+
+app.use(http.logger)
+
+app.use(http.formdata)
+
+app.port = 3000
+
+app.run()
