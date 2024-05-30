@@ -14,7 +14,7 @@ let setDebug(value) = do
         term.log("Debug mode disabled")
 
 let server() = do
-    let class = {port: 3000, numThreads: 5, callback: ()=term.log("Server running on port "+class.port)}
+    let class = {port: 3000, numThreads: 10, callback: ()=term.log("Server running on port "+class.port)}
     let threads = []
     let routes = []
     let Socket = null
@@ -27,7 +27,8 @@ let server() = do
             throwError("Server already running")
         Socket = socket.server("tcp", class.port)
         let starter() = do
-            thread(()=listener.listener(Socket, routes, class.onErr)).start()
+            for (i from 0 to class.numThreads) do
+                thread(()=listener.listener(Socket, routes, class.onErr)).start()
             class.callback()
         let t = thread(starter)
         t.start()
