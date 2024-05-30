@@ -3,5 +3,5 @@ import "handleRequest" as handleRequest
 let listener(Socket, routes, onErr) = do
     while (not Socket.isClosed()) try do
         let accept = Socket.accept()
-        handleRequest.handle(routes, accept, onErr)
+        thread(()=handleRequest.handle(routes, accept, onErr)).start()
     catch (e) if (onErr) onErr(e)

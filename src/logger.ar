@@ -1,15 +1,14 @@
 let logger(req, res) = do
+    let date = time.now()
     let onEnd() = do
-        let COLOUR = null
+        let dateAfter = time.now()
+        let COLOUR = colour.fg.magenta
         if (res.code >= 200 && res.code < 300) do
             COLOUR = colour.fg.green
         else if (res.code >= 300 && res.code < 400) do
             COLOUR = colour.fg.yellow
         else if (res.code >= 400 && res.code < 500) do
             COLOUR = colour.fg.red
-        else do
-            COLOUR = colour.fg.magenta
-        date = time.now().format()
-        term.log(colour.set(COLOUR, req.RemoteAddr+" - - ["+date+"] "+req.method+" "+req.path+" - "+string(res.code)))
+        term.log(colour.set(COLOUR, req.RemoteAddr+" - - ["+dateAfter.format()+"] "+req.method+" "+req.path+" - "+string(res.code)+" - "+string(dateAfter.unixMilli()-date.unixMilli()) +"ms"))
     req.on.headersSent.append(onEnd)
     res.next()
