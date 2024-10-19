@@ -1,0 +1,4 @@
+let path_to_filename(path) = do
+    if (platform.os == "windows") do
+        path = path.replace("\\", "/")
+    return path.split("/")[-1]

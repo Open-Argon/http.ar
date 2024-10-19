@@ -5,6 +5,7 @@ import "url.ar" as url
 import "version" as version
 import "renderTemplate" as renderTemplate
 import "contentType" as contentType
+import "path_to_filename" as *
 
 let __initHeaders() = {"content-type": "text/html; charset=utf-8", "server": "http.ar/"+version.version+" Argon/"+ArgonVersion}
 
@@ -45,9 +46,9 @@ let handle(routes, conn, onErr) = do
             let FILE = file.read(path)
             response.headers["content-type"] = contentType.getter(path)
             if (attachment) do
-                response.headers["content-disposition"] = "attachment; filename="+attachment
+                response.headers["content-disposition"] = "attachment; filename="+json.stringify(attachment)
             else do
-                response.headers["content-disposition"] = "inline; filename="+json.stringify(path.split("/")[-1])
+                response.headers["content-disposition"] = "inline; filename="+json.stringify(path_to_filename(path))
             let doRange = "range" in request.headers
             let FileSize = FILE.size()
             let size = FileSize
